@@ -13,10 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.betterlectio.presentation.theme.BetterLectioTheme
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import java.net.URL
+import java.net.HttpURLConnection
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import java.io.IOException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import androidx.wear.compose.material.*
 
 class MainActivity : ComponentActivity() {
@@ -30,21 +33,35 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp() {
-    ScalingLazyColumn(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        item {
-            ListHeader {
-                Text(text = "List Header")
-            }
+    var result = "Loading..."
+    runBlocking {
+        // run async code here
+        val deferredResult = async {
+            // async code here
+            getResponseString()
         }
-        items(20) {
-            Chip(
-                onClick = { },
-                label = { Text("List item $it") },
-                colors = ChipDefaults.secondaryChipColors()
-            )
-        }
+        // use the result of the async operation
+        result = deferredResult.await()
+
+    }
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center,
+        text = result
+    )
+}
+
+suspend fun getResponseString(): String = withContext(Dispatchers.IO) {
+    val url = URL("https://raw.githubusercontent.com/BetterLectio/WearOS-Native/main/README.md")
+    val connection = url.openConnection() as HttpURLConnection
+    connection.requestMethod = "GET"
+
+    val responseCode = connection.responseCode
+    if (responseCode == HttpURLConnection.HTTP_OK) {
+        val inputStream = connection.inputStream
+        inputStream.bufferedReader().readText()
+    } else {
+        throw IOException("HTTP error code: $responseCode")
     }
 }
 

@@ -13,9 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.Text
 import com.example.betterlectio.presentation.theme.BetterLectioTheme
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.wear.compose.material.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,66 +30,22 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp() {
-    @OptIn(ExperimentalPagerApi::class)
-@Composable
-fun VerticalPagerScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(30.dp)
+    ScalingLazyColumn(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        val items = createItems()
-        val pagerState = rememberPagerState()
-        val coroutineScope = rememberCoroutineScope()
-
-        Row(
-            modifier = Modifier.weight(1f)
-        ) {
-            VerticalPager(
-                count = items.size,
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { currentPage ->
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        text = items[currentPage].title,
-                        style = MaterialTheme.typography.h2
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = items[currentPage].subtitle,
-                        style = MaterialTheme.typography.h4
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text(
-                        text = items[currentPage].description,
-                        style = MaterialTheme.typography.body1
-                    )
-                }
+        item {
+            ListHeader {
+                Text(text = "List Header")
             }
-
-            VerticalPagerIndicator(
-                pagerState = pagerState,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(16.dp),
+        }
+        items(20) {
+            Chip(
+                onClick = { },
+                label = { Text("List item $it") },
+                colors = ChipDefaults.secondaryChipColors()
             )
         }
-
-        Button(
-            onClick = {
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(page = 2)
-                }
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(text = "Scroll to the third page")
-        }
     }
-}
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)

@@ -28,25 +28,66 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp() {
-    BetterLectioTheme {
-        /* If you have enough items in your list, use [ScalingLazyColumn] which is an optimized
-         * version of LazyColumn for wear devices with some added features. For more information,
-         * see d.android.com/wear/compose.
-         */
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background),
-            verticalArrangement = Arrangement.Center
+    @OptIn(ExperimentalPagerApi::class)
+@Composable
+fun VerticalPagerScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+    ) {
+        val items = createItems()
+        val pagerState = rememberPagerState()
+        val coroutineScope = rememberCoroutineScope()
+
+        Row(
+            modifier = Modifier.weight(1f)
         ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.primary,
-                text = "BetterLectio"
+            VerticalPager(
+                count = items.size,
+                state = pagerState,
+                modifier = Modifier.weight(1f)
+            ) { currentPage ->
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Text(
+                        text = items[currentPage].title,
+                        style = MaterialTheme.typography.h2
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = items[currentPage].subtitle,
+                        style = MaterialTheme.typography.h4
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = items[currentPage].description,
+                        style = MaterialTheme.typography.body1
+                    )
+                }
+            }
+
+            VerticalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(16.dp),
             )
         }
+
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(page = 2)
+                }
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(text = "Scroll to the third page")
+        }
     }
+}
 }
 
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)

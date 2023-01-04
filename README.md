@@ -20,4 +20,4 @@ Use the following guide to get started with BetterLectio-WearOS-Native
 ## TODO:
 - Add auth flow
 - Save auth token to device
-- Fetch data from https://api.betterlectio.dk
+- Fetch data from https://api.betterlectio.dk ✅ (/auth works, other endpoints are not working yet for some reason)

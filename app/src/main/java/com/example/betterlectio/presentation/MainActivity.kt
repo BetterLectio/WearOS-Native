@@ -23,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 import androidx.wear.compose.material.*
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -33,33 +34,65 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp() {
-    var result = "Loading..."
+    var lektier = ""
+    var base64Cookie = ""
+    var responseCookie = "Loading..."
+    var responseLektier = "loading..."
     runBlocking {
         // run async code here
-        val deferredResult = async {
+        val getCookie = async {
             // async code here
-            getResponseString()
+            getResponseString("auth", base64Cookie)
         }
         // use the result of the async operation
-        result = deferredResult.await()
-
+        responseCookie = getCookie.await()
+        base64Cookie = responseCookie
     }
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Center,
-        text = result
-    )
+    runBlocking {
+        val getLektier = async {
+            // async code here
+            getResponseString("lektier",base64Cookie)
+        }
+
+        responseLektier = getLektier.await()
+        lektier = responseLektier
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = lektier
+        )
+    }
 }
 
-suspend fun getResponseString(): String = withContext(Dispatchers.IO) {
-    val url = URL("https://raw.githubusercontent.com/BetterLectio/WearOS-Native/main/README.md")
+suspend fun getResponseString(endPoint: String, authCookie: String): String = withContext(Dispatchers.IO) {
+    val url = URL("https://api.betterlectio.dk/$endPoint")
     val connection = url.openConnection() as HttpURLConnection
     connection.requestMethod = "GET"
 
+    if (endPoint == "auth") {
+        connection.addRequestProperty("brugernavn", "XXXXXXXXXX")
+        connection.addRequestProperty("adgangskode", "XXXXXXXXXX")
+        connection.addRequestProperty("skole_id", "681")
+    } else if (endPoint == "skema") {
+        connection.addRequestProperty("uge", "1")
+        connection.addRequestProperty("\u00E5r", "2023") // not working
+        connection.addRequestProperty("cookie", authCookie)
+    } else {
+        connection.addRequestProperty("nonce", "no ide") // no idea
+        connection.addRequestProperty("cookie", authCookie)
+    }
+
     val responseCode = connection.responseCode
     if (responseCode == HttpURLConnection.HTTP_OK) {
-        val inputStream = connection.inputStream
-        inputStream.bufferedReader().readText()
+        val inputStream = connection.getHeaderField("set-lectio-cookie")
+        inputStream
     } else {
         throw IOException("HTTP error code: $responseCode")
     }

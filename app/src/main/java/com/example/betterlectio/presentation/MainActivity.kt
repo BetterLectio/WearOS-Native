@@ -38,29 +38,30 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun WearApp() {
-    //var lektier = ""
-    //var base64Cookie = ""
-    //var responseCookie = "Loading..."
-    //var responseLektier = "loading..."
-    //runBlocking {
-    //    // run async code here
-    //    val getCookie = async {
-    //        // async code here
-    //        getResponseString("auth", base64Cookie)
-    //    }
-    //    // use the result of the async operation
-    //    responseCookie = getCookie.await()
-    //    base64Cookie = responseCookie
-    //}
-    //runBlocking {
-    //    val getLektier = async {
-    //        // async code here
-    //        getResponseString("lektier",base64Cookie)
-    //    }
-    //
-    //    responseLektier = getLektier.await()
-    //    lektier = responseLektier
-    //}
+    var lektier = ""
+    var base64Cookie = ""
+    var responseCookie = "Loading..."
+    var responseLektier = "loading..."
+    runBlocking {
+        // run async code here
+        val getCookie = async {
+            // async code here
+            getResponseString("auth", base64Cookie)
+        }
+        // use the result of the async operation
+        responseCookie = getCookie.await()
+        base64Cookie = responseCookie
+    }
+    runBlocking {
+        val getLektier = async {
+            // async code here
+            println(base64Cookie)
+            getResponseString("lektier",base64Cookie)
+        }
+
+        responseLektier = getLektier.await()
+        lektier = responseLektier
+    }
 
     val listState = rememberScalingLazyListState()
     Scaffold(
@@ -88,13 +89,6 @@ fun WearApp() {
                     Text(text = "List Header")
                 }
             }
-            items(20) {
-                Chip(
-                    onClick = { },
-                    label = { Text("List item $it") },
-                    colors = ChipDefaults.secondaryChipColors()
-                )
-            }
         }
     }
 
@@ -106,22 +100,26 @@ suspend fun getResponseString(endPoint: String, authCookie: String): String = wi
     connection.requestMethod = "GET"
 
     if (endPoint == "auth") {
-        connection.addRequestProperty("brugernavn", "XXXXXXXXXX")
-        connection.addRequestProperty("adgangskode", "XXXXXXXXXX")
+        connection.addRequestProperty("brugernavn", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        connection.addRequestProperty("adgangskode", "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         connection.addRequestProperty("skole_id", "681")
     } else if (endPoint == "skema") {
         connection.addRequestProperty("uge", "1")
         connection.addRequestProperty("\u00E5r", "2023") // not working
         connection.addRequestProperty("cookie", authCookie)
     } else {
-        connection.addRequestProperty("nonce", "no ide") // no idea
         connection.addRequestProperty("cookie", authCookie)
     }
 
     val responseCode = connection.responseCode
     if (responseCode == HttpURLConnection.HTTP_OK) {
-        val inputStream = connection.getHeaderField("set-lectio-cookie")
-        inputStream
+        if (endPoint == "auth" ) {
+            val inputStream = connection.getHeaderField("set-lectio-cookie")
+            inputStream
+        } else {
+            val inputStream = connection.inputStream
+            inputStream.bufferedReader().readText()
+        }
     } else {
         throw IOException("HTTP error code: $responseCode")
     }

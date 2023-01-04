@@ -61,6 +61,7 @@ fun WearApp() {
 
         responseLektier = getLektier.await()
         lektier = responseLektier
+        println(lektier)
     }
 
     val listState = rememberScalingLazyListState()
@@ -106,9 +107,9 @@ suspend fun getResponseString(endPoint: String, authCookie: String): String = wi
     } else if (endPoint == "skema") {
         connection.addRequestProperty("uge", "1")
         connection.addRequestProperty("\u00E5r", "2023") // not working
-        connection.addRequestProperty("cookie", authCookie)
+        connection.addRequestProperty("lectio-cookie", authCookie)
     } else {
-        connection.addRequestProperty("cookie", authCookie)
+        connection.addRequestProperty("lectio-cookie", authCookie)
     }
 
     val responseCode = connection.responseCode

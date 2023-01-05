@@ -80,11 +80,6 @@ fun load(): String {
 fun WearApp(skema: String) {
     val listState = rememberScalingLazyListState()
     Scaffold(
-        timeText = {
-            if (!listState.isScrollInProgress) {
-                TimeText()
-            }
-        },
         vignette = {
             Vignette(vignettePosition = VignettePosition.TopAndBottom)
         },

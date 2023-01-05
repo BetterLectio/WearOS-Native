@@ -61,4 +61,6 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    implementation 'org.json:json:20200518'
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0"
 }

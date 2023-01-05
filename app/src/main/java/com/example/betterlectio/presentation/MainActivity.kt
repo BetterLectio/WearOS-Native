@@ -3,9 +3,13 @@ package com.example.betterlectio.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.*
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.Chip
@@ -115,6 +119,7 @@ fun WearApp(skema: String) {
                     TitleCard(
                         onClick = { },
                         title = { Text("$hold") },
+                        time = { Text("$status")}
                     ) {
                         Text("$lokale")
                         Text("$tidspunkt")

@@ -24,24 +24,31 @@ import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.*
+import org.json.JSONObject
+import org.json.*
+import org.json.JSONArray
+
+open class JSONArray
+
+open class JSONObject
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val s = load()
         setContent {
-            WearApp()
+            WearApp(s)
         }
     }
 }
 
-@OptIn(ExperimentalWearMaterialApi::class)
-@Composable
-fun WearApp() {
-    var lektier = ""
+fun load(): String {
+    var skema = ""
+    var forside = ""
     var base64Cookie = ""
     var responseCookie = "Loading..."
-    var responseLektier = "loading..."
+    var responseForside = "loading..."
     runBlocking {
         // run async code here
         val getCookie = async {
@@ -52,18 +59,25 @@ fun WearApp() {
         responseCookie = getCookie.await()
         base64Cookie = responseCookie
     }
-    runBlocking {
-        val getLektier = async {
+    return runBlocking {
+        val getForside = async {
             // async code here
             println(base64Cookie)
-            getResponseString("lektier",base64Cookie)
+            getResponseString("forside", base64Cookie)
         }
 
-        responseLektier = getLektier.await()
-        lektier = responseLektier
-        println(lektier)
+        responseForside = getForside.await()
+        forside = responseForside
+        skema = (JSONObject(forside).get("skema") as JSONArray).toString()
+        println(skema)
+        println(forside)
+        skema
     }
+}
 
+@OptIn(ExperimentalWearMaterialApi::class)
+@Composable
+fun WearApp(skema: String) {
     val listState = rememberScalingLazyListState()
     Scaffold(
         timeText = {
@@ -87,7 +101,28 @@ fun WearApp() {
         ) {
             item {
                 ListHeader {
-                    Text(text = "List Header")
+                    Text(text = "Næste moduler")
+                }
+            }
+            for (i in 0..5) {
+                val skemaJson = JSONArray(skema)
+                // get item (the index is i)
+                val item = skemaJson.getJSONObject(i)
+                // get the value of the key 
+                val hold = item.getString("hold")
+                val tidspunkt = item.getString("tidspunkt")
+                val status = item.getString("status")
+                val lokale = item.getString("lokale")
+
+                println(hold+lokale+tidspunkt+status)
+                item { 
+                    TitleCard(
+                        onClick = { },
+                        title = { Text("$hold") },
+                    ) {
+                        Text("$lokale")
+                        Text("$tidspunkt")
+                    }
                 }
             }
         }
@@ -129,5 +164,5 @@ suspend fun getResponseString(endPoint: String, authCookie: String): String = wi
 @Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
 @Composable
 fun DefaultPreview() {
-    WearApp()
+    WearApp(load().toString())
 }

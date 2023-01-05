@@ -104,7 +104,8 @@ fun WearApp(skema: String) {
                     Text(text = "Næste moduler")
                 }
             }
-            for (i in 0..5) {
+            val total = JSONArray(skema).length() - 1
+            for (i in 0..total) {
                 val skemaJson = JSONArray(skema)
                 // get item (the index is i)
                 val item = skemaJson.getJSONObject(i)

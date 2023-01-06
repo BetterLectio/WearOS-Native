@@ -1,5 +1,9 @@
-# WearOS-Native
-Experience BetterLectio on your watch
+# WearOS-Native <img src="https://user-images.githubusercontent.com/99267380/211005830-bb64ea90-c637-4e8c-a948-dcfea2ab1d16.png" alt="logo" width="40"/>
+### Experience BetterLectio on your watch
+All WearOS 3.0 and higher are supported
+
+![37c2dd128257555 6152ccec92b3a](https://user-images.githubusercontent.com/99267380/211005621-61bdf522-4455-4546-963b-44734dc5b3c2.png)
+
 
 ## Contributing / Dev
 Use the following guide to get started with BetterLectio-WearOS-Native
